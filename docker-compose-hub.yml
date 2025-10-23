@@ -30,32 +30,108 @@ services:
     entrypoint: /bin/bash
     command: >
       -c "
-      echo 'Aguardando SQL Server ficar pronto...';
+      echo '================================================';
+      echo '  Inicializando Banco de Dados LojaDB';
+      echo '================================================';
       sleep 5;
+      
       echo 'Criando banco de dados...';
-      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -C -Q \"
-      IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'LojaDB') BEGIN CREATE DATABASE LojaDB; END;
-      USE LojaDB;
-      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Categorias') BEGIN
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -C -Q 'CREATE DATABASE LojaDB' 2>/dev/null || echo 'Banco LojaDB ja existe';
+      
+      echo 'Criando tabela Categorias...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -d LojaDB -C -Q \"
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Categorias')
+      BEGIN
         CREATE TABLE Categorias (Id INT PRIMARY KEY IDENTITY(1,1), Nome NVARCHAR(100) NOT NULL, Descricao NVARCHAR(500));
-        INSERT INTO Categorias (Nome, Descricao) VALUES ('Eletrônicos', 'Produtos eletrônicos'), ('Livros', 'Livros'), ('Roupas', 'Vestuário'), ('Alimentos', 'Alimentos'), ('Casa', 'Casa e Jardim');
-      END;
-      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Produtos') BEGIN
-        CREATE TABLE Produtos (Id INT PRIMARY KEY IDENTITY(1,1), Nome NVARCHAR(200) NOT NULL, Preco DECIMAL(18,2) NOT NULL, Estoque INT NOT NULL DEFAULT 0, CategoriaId INT NOT NULL, CONSTRAINT FK_Produtos_Categorias FOREIGN KEY (CategoriaId) REFERENCES Categorias(Id));
-        INSERT INTO Produtos (Nome, Preco, Estoque, CategoriaId) VALUES ('Notebook Dell', 3499.99, 15, 1), ('Mouse Logitech', 349.90, 50, 1), ('Clean Code', 89.90, 100, 2), ('Camiseta', 49.90, 200, 3), ('Café Premium', 29.90, 150, 4);
-      END;
-      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Clientes') BEGIN
-        CREATE TABLE Clientes (Id INT PRIMARY KEY IDENTITY(1,1), Nome NVARCHAR(200) NOT NULL, Email NVARCHAR(200) NOT NULL, Telefone NVARCHAR(20));
-        INSERT INTO Clientes (Nome, Email, Telefone) VALUES ('João Silva', 'joao@email.com', '11987654321'), ('Maria Santos', 'maria@email.com', '11976543210');
-      END;
-      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Pedidos') BEGIN
-        CREATE TABLE Pedidos (Id INT PRIMARY KEY IDENTITY(1,1), ClienteId INT NOT NULL, DataPedido DATETIME NOT NULL DEFAULT GETDATE(), ValorTotal DECIMAL(18,2) NOT NULL, CONSTRAINT FK_Pedidos_Clientes FOREIGN KEY (ClienteId) REFERENCES Clientes(Id));
-      END;
-      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PedidoItens') BEGIN
-        CREATE TABLE PedidoItens (Id INT PRIMARY KEY IDENTITY(1,1), PedidoId INT NOT NULL, ProdutoId INT NOT NULL, Quantidade INT NOT NULL, PrecoUnitario DECIMAL(18,2) NOT NULL, CONSTRAINT FK_PedidoItens_Pedidos FOREIGN KEY (PedidoId) REFERENCES Pedidos(Id), CONSTRAINT FK_PedidoItens_Produtos FOREIGN KEY (ProdutoId) REFERENCES Produtos(Id));
-      END;
+        INSERT INTO Categorias (Nome, Descricao) VALUES 
+          ('Eletrônicos', 'Produtos eletrônicos'),
+          ('Livros', 'Livros e publicações'),
+          ('Roupas', 'Vestuário'),
+          ('Alimentos', 'Alimentos'),
+          ('Casa', 'Casa e Jardim');
+        PRINT 'Tabela Categorias criada!';
+      END
+      ELSE PRINT 'Tabela Categorias ja existe';
       \";
-      echo 'Banco de dados configurado com sucesso!';
+      
+      echo 'Criando tabela Produtos...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -d LojaDB -C -Q \"
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Produtos')
+      BEGIN
+        CREATE TABLE Produtos (
+          Id INT PRIMARY KEY IDENTITY(1,1),
+          Nome NVARCHAR(200) NOT NULL,
+          Preco DECIMAL(18,2) NOT NULL,
+          Estoque INT NOT NULL DEFAULT 0,
+          CategoriaId INT NOT NULL,
+          CONSTRAINT FK_Produtos_Categorias FOREIGN KEY (CategoriaId) REFERENCES Categorias(Id)
+        );
+        INSERT INTO Produtos (Nome, Preco, Estoque, CategoriaId) VALUES 
+          ('Notebook Dell', 3499.99, 15, 1),
+          ('Mouse Logitech', 349.90, 50, 1),
+          ('Clean Code', 89.90, 100, 2),
+          ('Camiseta', 49.90, 200, 3),
+          ('Café Premium', 29.90, 150, 4);
+        PRINT 'Tabela Produtos criada!';
+      END
+      ELSE PRINT 'Tabela Produtos ja existe';
+      \";
+      
+      echo 'Criando tabela Clientes...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -d LojaDB -C -Q \"
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Clientes')
+      BEGIN
+        CREATE TABLE Clientes (
+          Id INT PRIMARY KEY IDENTITY(1,1),
+          Nome NVARCHAR(200) NOT NULL,
+          Email NVARCHAR(200) NOT NULL,
+          Telefone NVARCHAR(20)
+        );
+        INSERT INTO Clientes (Nome, Email, Telefone) VALUES 
+          ('João Silva', 'joao@email.com', '11987654321'),
+          ('Maria Santos', 'maria@email.com', '11976543210');
+        PRINT 'Tabela Clientes criada!';
+      END
+      ELSE PRINT 'Tabela Clientes ja existe';
+      \";
+      
+      echo 'Criando tabela Pedidos...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -d LojaDB -C -Q \"
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Pedidos')
+      BEGIN
+        CREATE TABLE Pedidos (
+          Id INT PRIMARY KEY IDENTITY(1,1),
+          ClienteId INT NOT NULL,
+          DataPedido DATETIME NOT NULL DEFAULT GETDATE(),
+          ValorTotal DECIMAL(18,2) NOT NULL,
+          CONSTRAINT FK_Pedidos_Clientes FOREIGN KEY (ClienteId) REFERENCES Clientes(Id)
+        );
+        PRINT 'Tabela Pedidos criada!';
+      END
+      ELSE PRINT 'Tabela Pedidos ja existe';
+      \";
+      
+      echo 'Criando tabela PedidoItens...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -d LojaDB -C -Q \"
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PedidoItens')
+      BEGIN
+        CREATE TABLE PedidoItens (
+          Id INT PRIMARY KEY IDENTITY(1,1),
+          PedidoId INT NOT NULL,
+          ProdutoId INT NOT NULL,
+          Quantidade INT NOT NULL,
+          PrecoUnitario DECIMAL(18,2) NOT NULL,
+          CONSTRAINT FK_PedidoItens_Pedidos FOREIGN KEY (PedidoId) REFERENCES Pedidos(Id),
+          CONSTRAINT FK_PedidoItens_Produtos FOREIGN KEY (ProdutoId) REFERENCES Produtos(Id)
+        );
+        PRINT 'Tabela PedidoItens criada!';
+      END
+      ELSE PRINT 'Tabela PedidoItens ja existe';
+      \";
+      
+      echo '================================================';
+      echo '  Banco de dados configurado com sucesso!';
+      echo '================================================';
       "
     networks:
       - loja-network
