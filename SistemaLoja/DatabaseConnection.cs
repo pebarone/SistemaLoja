@@ -4,12 +4,12 @@ namespace SistemaLoja.Lab12_ConexaoSQLServer;
 
 public class DatabaseConnection
 {
-    // TODO: Complete a connection string com os dados corretos
+    // EXERCÍCIO 1: Connection String configurada
     private static string connectionString = 
-        "Server=__________,1433;" +
-        "Database=__________;" +
-        "User Id=__________;" +
-        "Password=__________;" +
+        "Server=localhost,1433;" +
+        "Database=LojaDB;" +
+        "User Id=sa;" +
+        "Password=SqlServer2024!;" +
         "TrustServerCertificate=True;";
 
     public static SqlConnection GetConnection()

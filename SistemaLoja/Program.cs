@@ -44,7 +44,7 @@ namespace SistemaLoja
             while (continuar)
             {
                 MostrarMenu();
-                string opcao = Console.ReadLine();
+                string? opcao = Console.ReadLine();
                 
                 try
                 {
@@ -139,64 +139,236 @@ namespace SistemaLoja
         {
             Console.WriteLine("\n=== INSERIR NOVO PRODUTO ===");
             
-            // TODO: Solicite os dados do produto ao usuário
-            Console.Write("Nome: ");
-            string nome = Console.ReadLine();
-            
-            // TODO: Complete com Preco, Estoque, CategoriaId
-            
-            var produto = new Produto
+            try
             {
-                // TODO: Preencha as propriedades
-            };
-            
-            // repo.InserirProduto(produto);
+                Console.Write("Nome: ");
+                string nome = Console.ReadLine() ?? "";
+                
+                Console.Write("Preço: ");
+                decimal preco = decimal.Parse(Console.ReadLine() ?? "0");
+                
+                Console.Write("Estoque: ");
+                int estoque = int.Parse(Console.ReadLine() ?? "0");
+                
+                Console.Write("ID da Categoria: ");
+                int categoriaId = int.Parse(Console.ReadLine() ?? "0");
+                
+                var produto = new Produto
+                {
+                    Nome = nome,
+                    Preco = preco,
+                    Estoque = estoque,
+                    CategoriaId = categoriaId
+                };
+                
+                repo.InserirProduto(produto);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void AtualizarProdutoExistente(ProdutoRepository repo)
         {
-            // TODO: Implemente a atualização
             Console.WriteLine("\n=== ATUALIZAR PRODUTO ===");
             
-            Console.Write("ID do produto: ");
-            int id = int.Parse(Console.ReadLine());
-            
-            // TODO: Busque o produto e permita alterar os dados
+            try
+            {
+                Console.Write("ID do produto: ");
+                int id = int.Parse(Console.ReadLine() ?? "0");
+                
+                // Buscar o produto existente
+                var produto = repo.BuscarPorId(id);
+                
+                if (produto == null)
+                {
+                    Console.WriteLine($"\n⚠️ Produto com ID {id} não encontrado!");
+                    return;
+                }
+                
+                Console.WriteLine($"\nProduto atual: {produto.Nome} - {produto.Preco:C} - Estoque: {produto.Estoque}");
+                Console.WriteLine("\nDigite os novos valores (Enter para manter o atual):");
+                
+                Console.Write($"Nome [{produto.Nome}]: ");
+                string? nome = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(nome))
+                    produto.Nome = nome;
+                
+                Console.Write($"Preço [{produto.Preco:C}]: ");
+                string? precoStr = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(precoStr))
+                    produto.Preco = decimal.Parse(precoStr);
+                
+                Console.Write($"Estoque [{produto.Estoque}]: ");
+                string? estoqueStr = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(estoqueStr))
+                    produto.Estoque = int.Parse(estoqueStr);
+                
+                Console.Write($"ID da Categoria [{produto.CategoriaId}]: ");
+                string? catStr = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(catStr))
+                    produto.CategoriaId = int.Parse(catStr);
+                
+                repo.AtualizarProduto(produto);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void DeletarProdutoExistente(ProdutoRepository repo)
         {
-            // TODO: Implemente a exclusão
             Console.WriteLine("\n=== DELETAR PRODUTO ===");
             
-            Console.Write("ID do produto: ");
-            int id = int.Parse(Console.ReadLine());
-            
-            // TODO: Confirme antes de deletar
+            try
+            {
+                Console.Write("ID do produto: ");
+                int id = int.Parse(Console.ReadLine() ?? "0");
+                
+                // Buscar o produto para confirmar
+                var produto = repo.BuscarPorId(id);
+                
+                if (produto == null)
+                {
+                    Console.WriteLine($"\n⚠️ Produto com ID {id} não encontrado!");
+                    return;
+                }
+                
+                Console.WriteLine($"\nProduto: {produto.Nome} - {produto.Preco:C}");
+                Console.Write("Confirma a exclusão? (S/N): ");
+                string? confirmacao = Console.ReadLine()?.ToUpper();
+                
+                if (confirmacao == "S")
+                {
+                    repo.DeletarProduto(id);
+                }
+                else
+                {
+                    Console.WriteLine("\n❌ Exclusão cancelada!");
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void ListarPorCategoria(ProdutoRepository repo)
         {
-            // TODO: Implemente
             Console.WriteLine("\n=== PRODUTOS POR CATEGORIA ===");
+            
+            try
+            {
+                Console.Write("ID da Categoria: ");
+                int categoriaId = int.Parse(Console.ReadLine() ?? "0");
+                
+                repo.ListarProdutosPorCategoria(categoriaId);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void CriarNovoPedido(PedidoRepository repo)
         {
-            // TODO: Implemente criação de pedido com itens
             Console.WriteLine("\n=== CRIAR NOVO PEDIDO ===");
+            
+            try
+            {
+                Console.Write("ID do Cliente: ");
+                int clienteId = int.Parse(Console.ReadLine() ?? "0");
+                
+                var pedido = new Pedido
+                {
+                    ClienteId = clienteId,
+                    DataPedido = DateTime.Now,
+                    ValorTotal = 0
+                };
+                
+                List<PedidoItem> itens = new List<PedidoItem>();
+                decimal valorTotal = 0;
+                
+                bool adicionarMais = true;
+                while (adicionarMais)
+                {
+                    Console.Write("\nID do Produto: ");
+                    int produtoId = int.Parse(Console.ReadLine() ?? "0");
+                    
+                    Console.Write("Quantidade: ");
+                    int quantidade = int.Parse(Console.ReadLine() ?? "0");
+                    
+                    Console.Write("Preço Unitário: ");
+                    decimal precoUnitario = decimal.Parse(Console.ReadLine() ?? "0");
+                    
+                    var item = new PedidoItem
+                    {
+                        ProdutoId = produtoId,
+                        Quantidade = quantidade,
+                        PrecoUnitario = precoUnitario
+                    };
+                    
+                    itens.Add(item);
+                    valorTotal += quantidade * precoUnitario;
+                    
+                    Console.Write("\nAdicionar mais itens? (S/N): ");
+                    adicionarMais = Console.ReadLine()?.ToUpper() == "S";
+                }
+                
+                pedido.ValorTotal = valorTotal;
+                
+                Console.WriteLine($"\nValor total do pedido: {valorTotal:C}");
+                Console.Write("Confirmar criação do pedido? (S/N): ");
+                
+                if (Console.ReadLine()?.ToUpper() == "S")
+                {
+                    repo.CriarPedido(pedido, itens);
+                }
+                else
+                {
+                    Console.WriteLine("\n❌ Pedido cancelado!");
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void ListarPedidosDeCliente(PedidoRepository repo)
         {
-            // TODO: Implemente
             Console.WriteLine("\n=== PEDIDOS DO CLIENTE ===");
+            
+            try
+            {
+                Console.Write("ID do Cliente: ");
+                int clienteId = int.Parse(Console.ReadLine() ?? "0");
+                
+                repo.ListarPedidosCliente(clienteId);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
 
         static void DetalhesDoPedido(PedidoRepository repo)
         {
-            // TODO: Implemente
             Console.WriteLine("\n=== DETALHES DO PEDIDO ===");
+            
+            try
+            {
+                Console.Write("ID do Pedido: ");
+                int pedidoId = int.Parse(Console.ReadLine() ?? "0");
+                
+                repo.ObterDetalhesPedido(pedidoId);
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("\n❌ Erro: Formato de número inválido!");
+            }
         }
     }
 }

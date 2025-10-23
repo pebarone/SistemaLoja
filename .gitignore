@@ -1,0 +1,42 @@
+# Build results
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+# NuGet Packages folder can be ignored if packages are restored on build
+packages/
+
+# Logs
+*.log
+
+# User-specific files
+*.swp
+*.bak
+*.tmp
+
+# Rider
+.idea/
+*.sln.iml
+
+# Dotnet environment
+.env
+
+# Test results
+TestResults/
+
+# Others
+*.vspscc
+*.vssscc
+_ReSharper*/
