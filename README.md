@@ -18,36 +18,7 @@ curl -o quickstart.bat https://raw.githubusercontent.com/pebarone/SistemaLoja/ma
 quickstart.bat
 ```
 
-### Opção 1: Docker Compose (Recomendado - Build Local)
-
-```bash
-# Clonar o repositório
-git clone https://github.com/pebarone/SistemaLoja.git
-cd SistemaLoja
-
-# Iniciar todo o ambiente (SQL Server + Banco + Aplicação)
-docker-compose up --build
-
-# Ou em modo detached (background)
-docker-compose up --build -d
-
-# Para modo interativo
-docker-compose run --rm app
-```
-
-### Opção 2: Imagem do Docker Hub
-
-```bash
-# Pull da imagem pronta
-docker pull pbrnx/cp5:latest
-
-# Executar (requer SQL Server rodando)
-docker run -it --rm \
-  -e SQL_SERVER=host.docker.internal \
-  pbrnx/cp5:latest
-```
-
-### Opção 3: Ambiente Completo do Docker Hub
+### Opção 1: Ambiente Completo do Docker Hub
 
 **IMPORTANTE**: Use o arquivo `docker-compose-standalone.yml` que não depende de arquivos externos.
 
@@ -65,6 +36,37 @@ docker-compose up
 ```
 
 **Vantagem**: Este arquivo é standalone e **NÃO** precisa de setup.sql ou Dockerfile externos!
+
+### Opção 2: Docker Compose (Recomendado - Build Local)
+
+```bash
+# Clonar o repositório
+git clone https://github.com/pebarone/SistemaLoja.git
+cd SistemaLoja
+
+# Iniciar todo o ambiente (SQL Server + Banco + Aplicação)
+docker-compose up --build
+
+# Ou em modo detached (background)
+docker-compose up --build -d
+
+# Para modo interativo
+docker-compose run --rm app
+```
+
+### Opção 3: Imagem do Docker Hub
+
+```bash
+# Pull da imagem pronta
+docker pull pbrnx/cp5:latest
+
+# Executar (requer SQL Server rodando)
+docker run -it --rm \
+  -e SQL_SERVER=host.docker.internal \
+  pbrnx/cp5:latest
+```
+
+
 
 ## 📦 O que está incluído?
 
