@@ -55,15 +55,30 @@ echo.
 echo AGUARDE: SQL Server pode levar 30-60 segundos para inicializar
 echo.
 
-docker-compose up
+REM Iniciar serviços em background primeiro
+docker-compose up -d sqlserver sqlserver-init
+
+echo Aguardando banco de dados inicializar...
+timeout /t 15 /nobreak >nul
+
+echo.
+echo Iniciando aplicacao de forma interativa...
+echo.
+
+REM Executar app de forma interativa
+docker-compose run --rm app
 
 echo.
 echo ================================================
 echo   Ambiente encerrado
 echo ================================================
 echo.
-echo Para reiniciar, execute:
+echo Para parar os servicos:
 echo   cd %TEMP_DIR%
-echo   docker-compose up
+echo   docker-compose down
+echo.
+echo Para reiniciar:
+echo   cd %TEMP_DIR%
+echo   docker-compose run --rm app
 echo.
 pause
