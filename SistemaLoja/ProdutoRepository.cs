@@ -216,14 +216,89 @@ public class ProdutoRepository
     // DESAFIO 1: Buscar produtos com estoque baixo
     public void ListarProdutosEstoqueBaixo(int quantidadeMinima)
     {
-        // TODO: Liste produtos com estoque menor que quantidadeMinima
-        // Mostre um alerta visual para chamar atenção
+        Console.WriteLine($"\n=== PRODUTOS COM ESTOQUE BAIXO (Menor que {quantidadeMinima}) ===\n");
+        
+        string sql = "SELECT * FROM Produtos WHERE Estoque < @QuantidadeMinima ORDER BY Estoque ASC";
+        
+        using (SqlConnection conn = DatabaseConnection.GetConnection())
+        {
+            conn.Open();
+            
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@QuantidadeMinima", quantidadeMinima);
+                
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    Console.WriteLine("{0,-5} {1,-30} {2,-15} {3,-10}", 
+                        "ID", "Nome", "Preço", "Estoque");
+                    Console.WriteLine(new string('-', 65));
+                    
+                    bool encontrou = false;
+                    while (reader.Read())
+                    {
+                        encontrou = true;
+                        int estoque = Convert.ToInt32(reader["Estoque"]);
+                        string aviso = estoque == 0 ? " ⚠️ SEM ESTOQUE!" : "";
+                        
+                        Console.ForegroundColor = estoque == 0 ? ConsoleColor.Red : ConsoleColor.Yellow;
+                        Console.WriteLine("{0,-5} {1,-30} {2,-15:C} {3,-10}{4}", 
+                            reader["Id"],
+                            reader["Nome"],
+                            reader["Preco"],
+                            estoque,
+                            aviso);
+                        Console.ResetColor();
+                    }
+                    
+                    if (!encontrou)
+                    {
+                        Console.WriteLine("✅ Nenhum produto com estoque baixo. Parabéns!");
+                    }
+                }
+            }
+        }
     }
 
     // DESAFIO 2: Buscar produtos por nome (LIKE)
     public void BuscarProdutosPorNome(string termoBusca)
     {
-        // TODO: Implemente busca com LIKE
-        // Dica: Use '%' + termoBusca + '%'
+        Console.WriteLine($"\n=== BUSCA POR NOME: '{termoBusca}' ===\n");
+        
+        string sql = "SELECT * FROM Produtos WHERE Nome LIKE @TermoBusca ORDER BY Nome";
+        
+        using (SqlConnection conn = DatabaseConnection.GetConnection())
+        {
+            conn.Open();
+            
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@TermoBusca", "%" + termoBusca + "%");
+                
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    Console.WriteLine("{0,-5} {1,-30} {2,-15} {3,-10} {4,-12}", 
+                        "ID", "Nome", "Preço", "Estoque", "CategoriaID");
+                    Console.WriteLine(new string('-', 75));
+                    
+                    bool encontrou = false;
+                    while (reader.Read())
+                    {
+                        encontrou = true;
+                        Console.WriteLine("{0,-5} {1,-30} {2,-15:C} {3,-10} {4,-12}", 
+                            reader["Id"],
+                            reader["Nome"],
+                            reader["Preco"],
+                            reader["Estoque"],
+                            reader["CategoriaId"]);
+                    }
+                    
+                    if (!encontrou)
+                    {
+                        Console.WriteLine($"Nenhum produto encontrado com '{termoBusca}'.");
+                    }
+                }
+            }
+        }
     }
 }

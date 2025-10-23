@@ -196,7 +196,47 @@ public class PedidoRepository
     // DESAFIO 3: Calcular total de vendas por período
     public void TotalVendasPorPeriodo(DateTime dataInicio, DateTime dataFim)
     {
-        // TODO: Calcule o total de vendas em um período
-        // Use ExecuteScalar para obter a soma
+        Console.WriteLine($"\n=== TOTAL DE VENDAS ({dataInicio:dd/MM/yyyy} a {dataFim:dd/MM/yyyy}) ===\n");
+        
+        string sql = "SELECT SUM(ValorTotal) as TotalVendas, COUNT(*) as TotalPedidos " +
+                     "FROM Pedidos " +
+                     "WHERE DataPedido >= @DataInicio AND DataPedido <= @DataFim";
+        
+        using (SqlConnection conn = DatabaseConnection.GetConnection())
+        {
+            conn.Open();
+            
+            using (SqlCommand cmd = new SqlCommand(sql, conn))
+            {
+                cmd.Parameters.AddWithValue("@DataInicio", dataInicio);
+                cmd.Parameters.AddWithValue("@DataFim", dataFim);
+                
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        object? totalVendas = reader["TotalVendas"];
+                        int totalPedidos = Convert.ToInt32(reader["TotalPedidos"]);
+                        
+                        if (totalVendas != DBNull.Value)
+                        {
+                            decimal valor = Convert.ToDecimal(totalVendas);
+                            Console.WriteLine($"Total de Pedidos: {totalPedidos}");
+                            Console.WriteLine($"Total de Vendas: {valor:C}");
+                            
+                            if (totalPedidos > 0)
+                            {
+                                decimal mediaVenda = valor / totalPedidos;
+                                Console.WriteLine($"Ticket Médio: {mediaVenda:C}");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Nenhuma venda encontrada neste período.");
+                        }
+                    }
+                }
+            }
+        }
     }
 }
