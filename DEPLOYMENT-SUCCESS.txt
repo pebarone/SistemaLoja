@@ -15,30 +15,46 @@ Tags disponíveis:
   COMO USAR
 ================================================
 
-Opção 1 - Pull direto:
-  docker pull pbrnx/cp5:latest
+Opção 1 - Super Rápido (Windows):
+  curl -o quickstart.bat https://raw.githubusercontent.com/pebarone/SistemaLoja/master/quickstart.bat
+  quickstart.bat
 
-Opção 2 - Docker Compose (completo):
+Opção 2 - Docker Compose do Hub (sem build):
+  # Criar pasta
+  mkdir sistemaloja-teste && cd sistemaloja-teste
+  
+  # Baixar arquivos (Windows PowerShell)
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose-hub.yml" -OutFile "docker-compose.yml"
+  Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pebarone/SistemaLoja/master/setup.sql" -OutFile "setup.sql"
+  
+  # Executar
+  docker-compose up
+
+Opção 3 - Clone completo (com build):
   git clone https://github.com/pebarone/SistemaLoja.git
   cd SistemaLoja
-  docker-compose up
+  docker-compose up --build
 
-Opção 3 - Docker Compose remoto:
-  curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose.yml
-  docker-compose up
+Opção 4 - Apenas pull:
+  docker pull pbrnx/cp5:latest
 
 ================================================
   ARQUIVOS CRIADOS
 ================================================
 
 ✅ README.md - Documentação principal atualizada
+✅ QUICKSTART.md - Guia de início rápido
 ✅ DOCKER-HUB-DEPLOYMENT.md - Guia de deployment
+✅ docker-compose.yml - Orquestração com build local
+✅ docker-compose-hub.yml - Orquestração com imagem do Hub
 ✅ docker-push.bat - Script automatizado (Windows)
 ✅ docker-push.sh - Script automatizado (Linux/Mac)
+✅ quickstart.bat - Script de execução rápida
+✅ setup.sql - Inicialização do banco de dados
 ✅ Dockerfile - Build da aplicação
-✅ docker-compose.yml - Orquestração completa
 ✅ .gitignore - Configurado para .NET
 ✅ .dockerignore - Otimização do build
+✅ DEPLOYMENT-SUCCESS.txt - Este arquivo
 
 ================================================
   INFORMAÇÕES DA IMAGEM

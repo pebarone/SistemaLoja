@@ -1,0 +1,169 @@
+version: '3.8'
+
+# ================================================
+# Sistema Loja - Docker Compose Standalone
+# Versão completa que NÃO requer arquivos externos
+# Basta copiar este arquivo e executar: docker-compose up
+# ================================================
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sistemaloja-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=SqlServer2024!
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P SqlServer2024! -Q 'SELECT 1' -C || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - loja-network
+
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sistemaloja-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      echo '================================================';
+      echo '  Inicializando Banco de Dados LojaDB';
+      echo '================================================';
+      sleep 5;
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P 'SqlServer2024!' -C -Q \"
+      -- Criar banco de dados
+      IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'LojaDB') 
+      BEGIN 
+        CREATE DATABASE LojaDB; 
+        PRINT 'Banco LojaDB criado!';
+      END;
+      USE LojaDB;
+      
+      -- Criar tabela Categorias
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Categorias') 
+      BEGIN
+        CREATE TABLE Categorias (
+          Id INT PRIMARY KEY IDENTITY(1,1), 
+          Nome NVARCHAR(100) NOT NULL, 
+          Descricao NVARCHAR(500)
+        );
+        INSERT INTO Categorias (Nome, Descricao) VALUES 
+          ('Eletrônicos', 'Produtos eletrônicos e tecnologia'),
+          ('Livros', 'Livros e publicações'),
+          ('Roupas', 'Vestuário e acessórios'),
+          ('Alimentos', 'Produtos alimentícios'),
+          ('Casa e Jardim', 'Itens para casa');
+        PRINT 'Tabela Categorias criada!';
+      END;
+      
+      -- Criar tabela Produtos
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Produtos') 
+      BEGIN
+        CREATE TABLE Produtos (
+          Id INT PRIMARY KEY IDENTITY(1,1), 
+          Nome NVARCHAR(200) NOT NULL, 
+          Preco DECIMAL(18,2) NOT NULL, 
+          Estoque INT NOT NULL DEFAULT 0, 
+          CategoriaId INT NOT NULL, 
+          CONSTRAINT FK_Produtos_Categorias FOREIGN KEY (CategoriaId) REFERENCES Categorias(Id)
+        );
+        INSERT INTO Produtos (Nome, Preco, Estoque, CategoriaId) VALUES 
+          ('Notebook Dell Inspiron 15', 3499.99, 15, 1),
+          ('Mouse Logitech MX Master', 349.90, 50, 1),
+          ('Teclado Mecânico Redragon', 289.90, 30, 1),
+          ('Monitor LG 24', 899.00, 20, 1),
+          ('Clean Code - Robert Martin', 89.90, 100, 2),
+          ('Design Patterns', 120.00, 45, 2),
+          ('Camiseta Básica Preta', 49.90, 200, 3),
+          ('Calça Jeans Masculina', 159.90, 80, 3),
+          ('Café Premium 500g', 29.90, 150, 4),
+          ('Chocolate Suíço', 15.90, 200, 4),
+          ('Vaso Decorativo', 45.00, 40, 5),
+          ('Almofada Estampada', 35.90, 60, 5);
+        PRINT 'Tabela Produtos criada!';
+      END;
+      
+      -- Criar tabela Clientes
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Clientes') 
+      BEGIN
+        CREATE TABLE Clientes (
+          Id INT PRIMARY KEY IDENTITY(1,1), 
+          Nome NVARCHAR(200) NOT NULL, 
+          Email NVARCHAR(200) NOT NULL, 
+          Telefone NVARCHAR(20)
+        );
+        INSERT INTO Clientes (Nome, Email, Telefone) VALUES 
+          ('João Silva', 'joao.silva@email.com', '11987654321'),
+          ('Maria Santos', 'maria.santos@email.com', '11976543210'),
+          ('Pedro Oliveira', 'pedro.oliveira@email.com', '11965432109');
+        PRINT 'Tabela Clientes criada!';
+      END;
+      
+      -- Criar tabela Pedidos
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Pedidos') 
+      BEGIN
+        CREATE TABLE Pedidos (
+          Id INT PRIMARY KEY IDENTITY(1,1), 
+          ClienteId INT NOT NULL, 
+          DataPedido DATETIME NOT NULL DEFAULT GETDATE(), 
+          ValorTotal DECIMAL(18,2) NOT NULL, 
+          CONSTRAINT FK_Pedidos_Clientes FOREIGN KEY (ClienteId) REFERENCES Clientes(Id)
+        );
+        PRINT 'Tabela Pedidos criada!';
+      END;
+      
+      -- Criar tabela PedidoItens
+      IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PedidoItens') 
+      BEGIN
+        CREATE TABLE PedidoItens (
+          Id INT PRIMARY KEY IDENTITY(1,1), 
+          PedidoId INT NOT NULL, 
+          ProdutoId INT NOT NULL, 
+          Quantidade INT NOT NULL, 
+          PrecoUnitario DECIMAL(18,2) NOT NULL, 
+          CONSTRAINT FK_PedidoItens_Pedidos FOREIGN KEY (PedidoId) REFERENCES Pedidos(Id), 
+          CONSTRAINT FK_PedidoItens_Produtos FOREIGN KEY (ProdutoId) REFERENCES Produtos(Id)
+        );
+        PRINT 'Tabela PedidoItens criada!';
+      END;
+      \";
+      echo '================================================';
+      echo '  Banco de dados configurado com sucesso!';
+      echo '  - 5 Categorias';
+      echo '  - 12 Produtos';
+      echo '  - 3 Clientes';
+      echo '================================================';
+      "
+    networks:
+      - loja-network
+
+  app:
+    image: pbrnx/cp5:latest
+    container_name: sistemaloja-app
+    depends_on:
+      sqlserver-init:
+        condition: service_completed_successfully
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - SQL_SERVER=sqlserver
+    stdin_open: true
+    tty: true
+    networks:
+      - loja-network
+
+volumes:
+  sqlserver-data:
+
+networks:
+  loja-network:
+    driver: bridge

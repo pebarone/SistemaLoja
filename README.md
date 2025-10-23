@@ -8,7 +8,17 @@ Sistema completo de gerenciamento de loja com SQL Server, desenvolvido para o La
 
 ## 🚀 Execução Rápida com Docker
 
-### Opção 1: Docker Compose (Recomendado)
+### ⚡ Super Rápido (1 comando)
+
+**Windows**: Baixe e execute [`quickstart.bat`](./quickstart.bat)
+
+```bash
+# Baixar e executar
+curl -o quickstart.bat https://raw.githubusercontent.com/pebarone/SistemaLoja/master/quickstart.bat
+quickstart.bat
+```
+
+### Opção 1: Docker Compose (Recomendado - Build Local)
 
 ```bash
 # Clonar o repositório
@@ -39,13 +49,22 @@ docker run -it --rm \
 
 ### Opção 3: Ambiente Completo do Docker Hub
 
-```bash
-# Pull do compose file
-curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose.yml
+**IMPORTANTE**: Use o arquivo `docker-compose-standalone.yml` que não depende de arquivos externos.
 
-# Executar
+```bash
+# 1. Criar uma pasta para o projeto
+mkdir sistemaloja-teste
+cd sistemaloja-teste
+
+# 2. Copiar o arquivo standalone (após clonar o repositório)
+# Ou baixar após fazer git push:
+curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose-standalone.yml
+
+# 3. Executar
 docker-compose up
 ```
+
+**Vantagem**: Este arquivo é standalone e **NÃO** precisa de setup.sql ou Dockerfile externos!
 
 ## 📦 O que está incluído?
 
@@ -293,9 +312,11 @@ Este projeto foi desenvolvido para fins educacionais.
 
 ## 🔗 Links
 
-- [Docker Hub](https://hub.docker.com/r/pbrnx/cp5)
-- [GitHub Repository](https://github.com/pebarone/SistemaLoja)
-- [Documentação Docker](./README-DOCKER.md)
+- **[Quick Start Guide](./QUICKSTART.md)** - Guia de início rápido sem clonar repositório
+- **[Docker Hub](https://hub.docker.com/r/pbrnx/cp5)** - Imagens prontas
+- **[GitHub Repository](https://github.com/pebarone/SistemaLoja)** - Código fonte
+- **[Documentação Docker](./README-DOCKER.md)** - Guia completo Docker
+- **[Deployment Guide](./DOCKER-HUB-DEPLOYMENT.md)** - Como foi feito o deployment
 
 ---
 
