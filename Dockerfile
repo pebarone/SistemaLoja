@@ -21,7 +21,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Instalar sqlcmd para verificação do banco de dados
-RUN apt-get update && apt-get install -y curl gnupg2 \
+RUN apt-get update && apt-get install -y curl gnupg2 dos2unix \
     && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && curl https://packages.microsoft.com/config/ubuntu/22.04/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
@@ -34,7 +34,7 @@ ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
 # Wait for SQL Server to be ready before starting
 COPY wait-for-sql.sh .
-RUN sed -i 's/\r$//' wait-for-sql.sh \
+RUN dos2unix wait-for-sql.sh \
     && chmod +x wait-for-sql.sh
 
 ENTRYPOINT ["./wait-for-sql.sh"]

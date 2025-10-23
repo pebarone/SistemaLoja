@@ -6,11 +6,18 @@
 
 Sistema completo de gerenciamento de loja com SQL Server, desenvolvido para o Lab 12 da disciplina C# Software Development.
 
-## 🚀 Execução Rápida com Docker
+## Integrantes do Grupo
+- Nome: Pedro Augusto Carneiro Barone Bomfim - RM: 99781 
+- Nome: João Pedro de Albuquerque Oliveira - RM: 551579
+- Nome: Matheus Augusto Santos Rego - RM:551466
+- Nome: Ian Cancian Nachtergaele - RM: 98387
 
-### ⚡ Modo Interativo Automático (Recomendado - Windows)
 
-**Opção mais fácil**: Execute o script que faz tudo automaticamente!
+## 🚀 Execução Recomendada
+
+### ⚡ Modo Interativo Automático (Windows)
+
+**Modo mais fácil:**
 
 ```bash
 # Clonar o repositório
@@ -21,76 +28,15 @@ cd SistemaLoja
 run-interactive.bat
 ```
 
-Este script irá:
-- ✅ Iniciar SQL Server
-- ✅ Aguardar até estar saudável (health check)
-- ✅ Criar banco de dados LojaDB automaticamente
-- ✅ Iniciar aplicação em modo interativo
+Esse script irá:
+- Iniciar SQL Server
+- Aguardar até estar saudável (health check)
+- Criar banco de dados LojaDB automaticamente
+- Iniciar aplicação em modo interativo
 
 ---
 
-### ⚡ Quick Start (Download Remoto)
-
-**Windows**: Baixe e execute [`quickstart.bat`](./quickstart.bat)
-
-```bash
-# Baixar e executar
-curl -o quickstart.bat https://raw.githubusercontent.com/pebarone/SistemaLoja/master/quickstart.bat
-quickstart.bat
-```
-
----
-
-### Opção 1: Ambiente Completo do Docker Hub
-
-**IMPORTANTE**: Siga os passos na ordem para garantir que o banco seja criado antes da aplicação iniciar.
-
-```bash
-# 1. Criar uma pasta para o projeto
-mkdir sistemaloja-teste
-cd sistemaloja-teste
-
-# 2. Baixar o arquivo standalone
-curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose-standalone.yml
-
-# 3. Iniciar SQL Server
-docker-compose up -d sqlserver
-
-# 4. Aguardar SQL Server ficar saudável (verificar com: docker-compose ps)
-# Quando aparecer "healthy", prossiga para o próximo passo
-
-# 5. Criar o banco de dados
-docker-compose up sqlserver-init
-
-# 6. Executar aplicação de forma INTERATIVA
-docker-compose run --rm app
-
-# OU: Para parar tudo depois
-docker-compose down
-```
-
-**Vantagem**: Este arquivo é standalone e **NÃO** precisa de setup.sql ou Dockerfile externos!
-
-### Opção 2: Docker Compose (Recomendado - Build Local)
-
-```bash
-# Clonar o repositório
-git clone https://github.com/pebarone/SistemaLoja.git
-cd SistemaLoja
-
-# Iniciar serviços (SQL Server + inicialização do banco)
-docker-compose up -d sqlserver sqlserver-init
-
-# Aguardar inicialização (verificar: docker-compose ps)
-
-# Executar aplicação de forma INTERATIVA
-docker-compose run --rm app
-
-# Alternativa: Build local e executar tudo junto (não interativo)
-docker-compose up --build
-```
-
-### Opção 3: Imagem do Docker Hub
+### ⚡ Modo Docker Hub (Imagem Pronta)
 
 ```bash
 # Pull da imagem pronta
@@ -336,26 +282,3 @@ docker-compose up --build
 - ✅ **Exercício 8**: Criar pedido com transação
 - ✅ **Exercício 9**: Listar pedidos de cliente
 - ✅ **Exercício 10**: Detalhes do pedido com JOIN
-
-## 👨‍💻 Autor
-
-**Augusto Barone**  
-Turma: 3ESPY  
-Disciplina: C# Software Development  
-Professor: Charles
-
-## 📄 Licença
-
-Este projeto foi desenvolvido para fins educacionais.
-
-## 🔗 Links
-
-- **[Quick Start Guide](./QUICKSTART.md)** - Guia de início rápido sem clonar repositório
-- **[Docker Hub](https://hub.docker.com/r/pbrnx/cp5)** - Imagens prontas
-- **[GitHub Repository](https://github.com/pebarone/SistemaLoja)** - Código fonte
-- **[Documentação Docker](./README-DOCKER.md)** - Guia completo Docker
-- **[Deployment Guide](./DOCKER-HUB-DEPLOYMENT.md)** - Como foi feito o deployment
-
----
-
-**Nota**: Certifique-se de ter o Docker instalado e rodando antes de executar os comandos acima.

@@ -19,17 +19,12 @@ if %errorlevel% neq 0 (
 echo [1/5] Docker verificado - OK
 echo.
 
-echo [2/5] Baixando ultima versao da imagem...
-docker pull pbrnx/cp5:latest >nul 2>&1
-echo Imagem atualizada!
-echo.
-
-echo [3/5] Iniciando SQL Server...
+echo [2/5] Iniciando SQL Server...
 docker-compose up -d sqlserver
 echo.
 
-echo [4/5] Aguardando SQL Server ficar saudavel...
-echo ^(Isso pode levar ate 60 segundos^)
+echo [3/5] Aguardando SQL Server ficar saudavel...
+echo (Isso pode levar ate 60 segundos)
 echo.
 
 :CHECK_HEALTH
@@ -44,11 +39,11 @@ echo.
 echo SQL Server esta pronto!
 echo.
 
-echo [5/5] Criando banco de dados LojaDB...
+echo [4/5] Criando banco de dados LojaDB...
 docker-compose up sqlserver-init
 echo.
 
-echo [6/6] Iniciando aplicacao de forma INTERATIVA...
+echo [5/5] Iniciando aplicacao de forma INTERATIVA...
 echo.
 echo ================================================
 echo   Pressione Ctrl+C para sair da aplicacao
