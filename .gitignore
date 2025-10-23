@@ -9,6 +9,9 @@ obj/
 # VS Code
 .vscode/
 
+# Visual Studio
+.vs/
+
 # OS generated files
 .DS_Store
 Thumbs.db
@@ -35,6 +38,9 @@ packages/
 
 # Test results
 TestResults/
+
+# Docker
+.dockerignore
 
 # Others
 *.vspscc

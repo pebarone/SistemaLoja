@@ -4,9 +4,9 @@ namespace SistemaLoja.Lab12_ConexaoSQLServer;
 
 public class DatabaseConnection
 {
-    // EXERCÍCIO 1: Connection String configurada
+    // Connection String - suporta ambiente local e Docker
     private static string connectionString = 
-        "Server=localhost,1433;" +
+        "Server=" + (Environment.GetEnvironmentVariable("SQL_SERVER") ?? "localhost") + ",1433;" +
         "Database=LojaDB;" +
         "User Id=sa;" +
         "Password=SqlServer2024!;" +
