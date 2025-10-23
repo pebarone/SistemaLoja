@@ -20,18 +20,26 @@ quickstart.bat
 
 ### Opção 1: Ambiente Completo do Docker Hub
 
-**IMPORTANTE**: Use o arquivo `docker-compose-standalone.yml` que não depende de arquivos externos.
+**IMPORTANTE**: Para terminal interativo, use `docker-compose run` em vez de `docker-compose up`.
 
 ```bash
 # 1. Criar uma pasta para o projeto
 mkdir sistemaloja-teste
 cd sistemaloja-teste
 
-# 2. Copiar o arquivo standalone (após clonar o repositório)
-# Ou baixar após fazer git push:
+# 2. Baixar o arquivo standalone
 curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose-standalone.yml
 
-# 3. Executar
+# 3a. Iniciar serviços em background
+docker-compose up -d sqlserver sqlserver-init
+
+# 3b. Aguardar banco inicializar (30-60 segundos)
+# Verificar status: docker-compose ps
+
+# 3c. Executar aplicação de forma INTERATIVA
+docker-compose run --rm app
+
+# Alternativa: Executar tudo junto (não interativo)
 docker-compose up
 ```
 
@@ -44,14 +52,16 @@ docker-compose up
 git clone https://github.com/pebarone/SistemaLoja.git
 cd SistemaLoja
 
-# Iniciar todo o ambiente (SQL Server + Banco + Aplicação)
-docker-compose up --build
+# Iniciar serviços (SQL Server + inicialização do banco)
+docker-compose up -d sqlserver sqlserver-init
 
-# Ou em modo detached (background)
-docker-compose up --build -d
+# Aguardar inicialização (verificar: docker-compose ps)
 
-# Para modo interativo
+# Executar aplicação de forma INTERATIVA
 docker-compose run --rm app
+
+# Alternativa: Build local e executar tudo junto (não interativo)
+docker-compose up --build
 ```
 
 ### Opção 3: Imagem do Docker Hub
