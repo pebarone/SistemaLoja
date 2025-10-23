@@ -34,6 +34,7 @@ ENV PATH="$PATH:/opt/mssql-tools18/bin"
 
 # Wait for SQL Server to be ready before starting
 COPY wait-for-sql.sh .
-RUN chmod +x wait-for-sql.sh
+RUN sed -i 's/\r$//' wait-for-sql.sh \
+    && chmod +x wait-for-sql.sh
 
 ENTRYPOINT ["./wait-for-sql.sh"]
