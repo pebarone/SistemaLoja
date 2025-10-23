@@ -8,7 +8,28 @@ Sistema completo de gerenciamento de loja com SQL Server, desenvolvido para o La
 
 ## 🚀 Execução Rápida com Docker
 
-### ⚡ Super Rápido (1 comando)
+### ⚡ Modo Interativo Automático (Recomendado - Windows)
+
+**Opção mais fácil**: Execute o script que faz tudo automaticamente!
+
+```bash
+# Clonar o repositório
+git clone https://github.com/pebarone/SistemaLoja.git
+cd SistemaLoja
+
+# Executar script interativo (Windows)
+run-interactive.bat
+```
+
+Este script irá:
+- ✅ Iniciar SQL Server
+- ✅ Aguardar até estar saudável (health check)
+- ✅ Criar banco de dados LojaDB automaticamente
+- ✅ Iniciar aplicação em modo interativo
+
+---
+
+### ⚡ Quick Start (Download Remoto)
 
 **Windows**: Baixe e execute [`quickstart.bat`](./quickstart.bat)
 
@@ -18,9 +39,11 @@ curl -o quickstart.bat https://raw.githubusercontent.com/pebarone/SistemaLoja/ma
 quickstart.bat
 ```
 
+---
+
 ### Opção 1: Ambiente Completo do Docker Hub
 
-**IMPORTANTE**: Para terminal interativo, use `docker-compose run` em vez de `docker-compose up`.
+**IMPORTANTE**: Siga os passos na ordem para garantir que o banco seja criado antes da aplicação iniciar.
 
 ```bash
 # 1. Criar uma pasta para o projeto
@@ -30,17 +53,20 @@ cd sistemaloja-teste
 # 2. Baixar o arquivo standalone
 curl -o docker-compose.yml https://raw.githubusercontent.com/pebarone/SistemaLoja/master/docker-compose-standalone.yml
 
-# 3a. Iniciar serviços em background
-docker-compose up -d sqlserver sqlserver-init
+# 3. Iniciar SQL Server
+docker-compose up -d sqlserver
 
-# 3b. Aguardar banco inicializar (30-60 segundos)
-# Verificar status: docker-compose ps
+# 4. Aguardar SQL Server ficar saudável (verificar com: docker-compose ps)
+# Quando aparecer "healthy", prossiga para o próximo passo
 
-# 3c. Executar aplicação de forma INTERATIVA
+# 5. Criar o banco de dados
+docker-compose up sqlserver-init
+
+# 6. Executar aplicação de forma INTERATIVA
 docker-compose run --rm app
 
-# Alternativa: Executar tudo junto (não interativo)
-docker-compose up
+# OU: Para parar tudo depois
+docker-compose down
 ```
 
 **Vantagem**: Este arquivo é standalone e **NÃO** precisa de setup.sql ou Dockerfile externos!
