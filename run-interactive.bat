@@ -29,7 +29,7 @@ docker-compose up -d sqlserver
 echo.
 
 echo [4/5] Aguardando SQL Server ficar saudavel...
-(Isso pode levar ate 60 segundos)
+echo ^(Isso pode levar ate 60 segundos^)
 echo.
 
 :CHECK_HEALTH
